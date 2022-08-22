@@ -350,5 +350,6 @@ def main():
     pygame.mixer.Sound.play(STARTING_GAME)
     mainMenu.Display(CYAN)
 
-
-main()
+    
+if __name__ == "__main__":
+    main()

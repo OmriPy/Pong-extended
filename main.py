@@ -1,21 +1,12 @@
 import pygame
-import random, os, sys, math
+import random, sys, math
 from multipledispatch import dispatch
+from utils import *
 
 # Initialization:
-def join(dirs: list):
-    path = dirs[0]
-    for i in range(len(dirs) - 1):
-        path = os.path.join(path, dirs[i+1])
-    return path
-
-def equal(vels: list) -> bool:
-    for i in range(len(vels)):
-        if vels[i] != vels[0]: return False
-    return True
-
 pygame.init()
 pygame.font.init()
+pygame.display.init()
 WIDTH, HEIGHT = 1000, 600
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong")
@@ -59,17 +50,17 @@ Paddle_right = pygame.Rect(WIDTH - 2 - 6, HEIGHT / 2 - 35, 6, 70)
 Paddle_left = pygame.Rect(2, HEIGHT / 2 - 35, 6, 70)
 ball = pygame.Rect(WIDTH / 2 - 15, HEIGHT / 2 - 15, 30, 30)
 
-play_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 - 100, 160, 50)
-settings_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 - 50 / 2, 160, 50)
-exit_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 + 50, 160, 50)
+play_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 - 50, 160, 50)
+settings_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 - 50 / 2 + 50, 160, 50)
+exit_button = pygame.Rect(WIDTH / 2 - 160 / 2, HEIGHT / 2 + 100, 160, 50)
 
-CLOUDS_Y = [(20, 75), (100, 200), (175, 225), (200, 300)]
+CLOUDS_Y = [(20, 75), (50, 150), (125, 175), (150, 250)]
 cloud1 = pygame.Rect(random.randint(0, WIDTH - CLOUD1.get_width()), random.randint(CLOUDS_Y[0][0], CLOUDS_Y[0][1]), CLOUD1.get_width(), CLOUD1.get_height())
 cloud2 = pygame.Rect(random.randint(0, WIDTH - CLOUD2.get_width()), random.randint(CLOUDS_Y[1][0], CLOUDS_Y[1][1]), CLOUD2.get_width(), CLOUD2.get_height())
 cloud3 = pygame.Rect(random.randint(0, WIDTH - CLOUD3.get_width()), random.randint(CLOUDS_Y[2][0], CLOUDS_Y[2][1]), CLOUD3.get_width(), CLOUD3.get_height())
 cloud4 = pygame.Rect(random.randint(0, WIDTH - CLOUD4.get_width()), random.randint(CLOUDS_Y[3][0], CLOUDS_Y[3][1]), CLOUD4.get_width(), CLOUD4.get_height())
 
-buttons_area = pygame.Surface((300, 300), pygame.SRCALPHA)
+buttons_area = pygame.Surface((275, 275), pygame.SRCALPHA)
 buttons_area_rect = pygame.Rect(0, 0, buttons_area.get_width(), buttons_area.get_height())
 
 gameOver = pygame.Surface((300, 300), pygame.SRCALPHA)
@@ -96,6 +87,7 @@ name_right, name_left = "Right", "Left"
 FPS_FONT = pygame.font.SysFont("cambria", 12, True)
 UI_FONT = pygame.font.SysFont("Verdana", 18)
 BUTTONS_FONT = pygame.font.SysFont("Verdana", 28, True)
+NAME_FONT = pygame.font.SysFont("showcardgothic", 100, False, True)
 
 # Other:
 clock = pygame.time.Clock()
@@ -113,13 +105,14 @@ class MainMenu:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type is pygame.QUIT:
-                    pygame.quit()
+                    quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_game.clicked(pygame.mouse.get_pos()):
                         game.Play()
                     elif button_exit.clicked(pygame.mouse.get_pos()):
-                        pygame.quit()
+                        Transition(WIN, CYAN, BLACK)
+                        quit()
                         sys.exit()
             self.Move_clouds()
             self.Draw(bg)
@@ -136,13 +129,15 @@ class MainMenu:
         for i in range(math.ceil(self.screen.get_width() / GRASS_IMGAE.get_width())):
             self.screen.blit(GRASS_IMGAE, (GRASS_IMGAE.get_width() * i, self.screen.get_height() - GRASS_IMGAE.get_height()))
         self.screen.blit(buttons_area, (self.screen.get_width() / 2 - buttons_area.get_width() / 2,
-                                        self.screen.get_height() / 2 - buttons_area.get_height() / 2))
+                                        self.screen.get_height() / 2 - buttons_area.get_height() / 2 + 50))
         pygame.draw.rect(buttons_area, TRANSPERANT_BLACK, buttons_area_rect, 0, 25)
-        button_game.Draw(BLUE, BLUE, WHITE, 3, False)
-        button_settings.Draw(PURPLE, PURPLE, WHITE, 3, False)
-        button_exit.Draw(RED, RED, WHITE, 3, False)
+        button_game.Draw(BLUE, BLUE, WHITE, 3, 10, False)
+        button_settings.Draw(PURPLE, PURPLE, WHITE, 3, 10, False)
+        button_exit.Draw(RED, RED, WHITE, 3, 10, False)
+        Name = NAME_FONT.render("PONG", 1, BLUE)
+        self.screen.blit(Name, (self.screen.get_width() / 2 - Name.get_width() / 2 + 10, 50))
 
-    
+
     def Move_clouds(self):
         i = 0
         for cloud in [cloud1, cloud2, cloud3, cloud4]:
@@ -161,14 +156,14 @@ class MainMenu:
 class Game:
 
     def __init__(self, MainSurface: pygame.Surface,  Ball: pygame.Rect, Paddle_right: pygame.Rect, Paddle_left: pygame.Rect,
-                FPS_font: pygame.font.Font, UI_font:pygame.font.Font, Hit_sound: pygame.mixer.Sound, Lost_sound: pygame.mixer.Sound):
+                FPS_font: pygame.font.Font, UI_Font:pygame.font.Font, Hit_sound: pygame.mixer.Sound, Lost_sound: pygame.mixer.Sound):
         self.playing = True
         self.screen = MainSurface
         self.ball = Ball
         self.paddle_right = Paddle_right
         self.paddle_left = Paddle_left
         self.fps_font = FPS_font
-        self.UI_font = UI_font
+        self.UI_font = UI_Font
         self.hit_sound = Hit_sound
         self.lose_sound = Lost_sound
         self.winner = ""
@@ -180,7 +175,7 @@ class Game:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type is pygame.QUIT:
-                    pygame.quit()
+                    quit()
                     sys.exit()
             self.Draw(SPECIAL_COLOR, GRAY, WHITE, BLACK)
             self.UI(CYAN)
@@ -189,16 +184,16 @@ class Game:
                 self.Ball_movement()
                 self.Paddles_movement()
             else:
-                pass
+                self.Center_ball_paddles()
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_ESCAPE]:
+                Transition(WIN, SPECIAL_COLOR, CYAN)
                 run = False
 
 
     def Draw(self, bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
         self.screen.fill(bg)
-        pygame.draw.line(self.screen, Lines_color, (self.screen.get_width() / 2 - 1, 0),
-                        (self.screen.get_width() / 2 - 1, self.screen.get_height()), 2)
+        pygame.draw.line(self.screen, Lines_color, (self.screen.get_width() / 2, 0), (self.screen.get_width() / 2, self.screen.get_height()), 2)
         pygame.draw.line(self.screen, Lines_color, (0, 80), (self.screen.get_width(), 80))
         pygame.draw.ellipse(self.screen, Ball_color, self.ball)
         pygame.draw.rect(self.screen, Paddles_color, self.paddle_right)
@@ -219,10 +214,12 @@ class Game:
             else:
                 right_player_name = self.UI_font.render(f"{name_right} Lost!", 1, RED)
                 left_player_name = self.UI_font.render(f"{name_left} Won!", 1, GREEN)
-            game_over = self.UI_font.render("Test", 1, GREEN)
+            game_over = self.UI_font.render("Hello there", 1, BLUE, WHITE)
             self.screen.blit(gameOver, (self.screen.get_width() / 2 - gameOver.get_width() / 2,
-                                                    self.screen.get_height() / 2 - gameOver.get_height() / 2))
+                                        self.screen.get_height() / 2 - gameOver.get_height() / 2))
             pygame.draw.rect(gameOver, TRANSPERANT_BLACK, gameOver_rect, 0, 25)
+            self.screen.blit(game_over, (self.screen.get_width() / 2 - game_over.get_width() / 2,
+                                        self.screen.get_height() / 2 - game_over.get_height() / 2))
         else: raise Exception("Something is wrong!")
         self.screen.blit(fps, (self.screen.get_width() - fps.get_width() - 3, 0))
         self.screen.blit(right_player_points, (self.screen.get_width() / 2 + 10, 10))
@@ -237,17 +234,17 @@ class Game:
         self.ball.y += ball_vel_y
         # Intersection with right paddle
         if self.ball.right >= self.paddle_right.left:
-            if self.ball.centery < self.paddle_right.bottom and\
-               self.ball.centery > self.paddle_right.top: # If the right paddle blocked the ball
+            if self.ball.centery - 5 < self.paddle_right.bottom and\
+               self.ball.centery + 5 > self.paddle_right.top: # If the right paddle blocked the ball
                 pygame.mixer.Sound.play(self.hit_sound)
                 ball_vel_x *= -1
                 self.ball.right = self.paddle_right.left
             else:
                 self.New_round("left")
         # Intersection with left paddle
-        if self.ball.left <= self.paddle_left.right:
-            if self.ball.centery < self.paddle_left.bottom and\
-               self.ball.centery > self.paddle_left.top: # If the left paddle blocked the ball
+        elif self.ball.left <= self.paddle_left.right:
+            if self.ball.centery - 5 < self.paddle_left.bottom and\
+               self.ball.centery + 5 > self.paddle_left.top: # If the left paddle blocked the ball
                 pygame.mixer.Sound.play(self.hit_sound)
                 ball_vel_x *= -1
                 self.ball.left = self.paddle_left.right
@@ -281,7 +278,7 @@ class Game:
         pygame.mixer.Sound.play(self.lose_sound)
         pygame.display.flip()
         pygame.event.pump()
-        pygame.time.delay(int(self.lose_sound.get_length()) * 1000)
+        pygame.time.delay(int(2.5 * 1000))
         self.ball.center = (self.screen.get_width() / 2, self.screen.get_height() / 2 + 80 / 2)
         if winner == "right":
             ball_vel_x = VELOCITIES[0][1]
@@ -296,6 +293,12 @@ class Game:
                 self.winner = name_left
                 self.playing = False
         else: raise Exception("Please enter \"right\" or \"left\".")
+    
+    
+    def Center_ball_paddles(self):
+        self.ball.center = (self.screen.get_width() / 2, self.screen.get_height() / 2 + 80 / 2)
+        self.paddle_right.centery = self.screen.get_height() / 2 + 80 / 2
+        self.paddle_left.centery = self.screen.get_height() / 2 + 80 / 2
 
 class Settings:
     pass
@@ -324,7 +327,7 @@ class Button:
     @dispatch(tuple, tuple, tuple, int, bool)
     def Draw(self, Outline_color: tuple, Text_color: tuple, bg: tuple, width: int, update: bool):
         text = self.font.render(self.text, 1, Text_color)
-        pygame.draw.rect(self.screen, bg, pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height))
+        pygame.draw.rect(self.screen, bg, pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height), 0)
         pygame.draw.rect(self.screen, Outline_color, self.rect, width)
         self.screen.blit(text, (self.rect.centerx - text.get_width() / 2, self.rect.centery - text.get_height() / 2))
         if update: pygame.display.update()
@@ -332,7 +335,7 @@ class Button:
     @dispatch(tuple, tuple, tuple, int, int, bool)
     def Draw(self, Outline_color: tuple, Text_color: tuple, bg: tuple, width: int, border_radius: int, update: bool):
         text = self.font.render(self.text, 1, Text_color)
-        pygame.draw.rect(self.screen, bg, pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height))
+        pygame.draw.rect(self.screen, bg, pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height), 0, border_radius)
         pygame.draw.rect(self.screen, Outline_color, self.rect, width, border_radius)
         self.screen.blit(text, (self.rect.centerx - text.get_width() / 2, self.rect.centery - text.get_height() / 2))
         if update: pygame.display.update()
@@ -347,9 +350,10 @@ button_exit = Button(WIN, exit_button, "Exit", BUTTONS_FONT)
 
 
 def main():
+    Transition(WIN, BLACK, CYAN)
     pygame.mixer.Sound.play(STARTING_GAME)
     mainMenu.Display(CYAN)
 
-    
+
 if __name__ == "__main__":
     main()

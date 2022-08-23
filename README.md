@@ -1,7 +1,7 @@
 # Pong-extended
 Reminder to myself: I made Pong in python because I wanted to know how to use pygame.
 
-*Talking to myself*
+\*Talking to myself\*
 ## pip install
 Make sure you have pygame installed by typing the in the command prompt:
 ```

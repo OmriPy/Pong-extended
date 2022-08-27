@@ -66,6 +66,9 @@ buttons_area_rect = pygame.Rect(0, 0, buttons_area.get_width(), buttons_area.get
 gameOver = pygame.Surface((300, 300), pygame.SRCALPHA)
 gameOver_rect = pygame.Rect(0, 0, gameOver.get_width(), gameOver.get_height())
 
+gamePaused = pygame.Surface((250, 250), pygame.SRCALPHA)
+gamePaused_rect = pygame.Rect(0, 0, gamePaused.get_width(), gamePaused.get_height())
+
 # Velocities
 VELOCITIES = [[4, -4], [3, -3]]
 ball_vel_x, ball_vel_y = random.choice(VELOCITIES[0]), random.choice(VELOCITIES[1])
@@ -85,9 +88,11 @@ name_right, name_left = "Right", "Left"
 
 # Fonts:
 FPS_FONT = pygame.font.SysFont("cambria", 12, True)
-UI_FONT = pygame.font.SysFont("Verdana", 18)
+SCORE_FONT = pygame.font.SysFont("Verdana", 18)
+NAMES_FONT = pygame.font.SysFont("Verdana", 22, True)
+PAUSED_FONT = pygame.font.SysFont("Calibri", 30, True)
 BUTTONS_FONT = pygame.font.SysFont("Verdana", 28, True)
-NAME_FONT = pygame.font.SysFont("showcardgothic", 100, False, True)
+PONG_FONT = pygame.font.SysFont("showcardgothic", 100, False, True)
 
 # Other:
 clock = pygame.time.Clock()
@@ -108,9 +113,9 @@ class MainMenu:
                     quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if button_game.clicked(pygame.mouse.get_pos()):
+                    if button_game.on_button(pygame.mouse.get_pos()):
                         game.Play()
-                    elif button_exit.clicked(pygame.mouse.get_pos()):
+                    elif button_exit.on_button(pygame.mouse.get_pos()):
                         Transition(WIN, CYAN, BLACK)
                         quit()
                         sys.exit()
@@ -137,7 +142,7 @@ class MainMenu:
         button_game.Draw(BLUE, BLUE, WHITE, 3, 10, False)
         button_settings.Draw(PURPLE, PURPLE, WHITE, 3, 10, False)
         button_exit.Draw(RED, RED, WHITE, 3, 10, False)
-        Name = NAME_FONT.render("PONG", 1, BLUE)
+        Name = PONG_FONT.render("PONG", 1, BLUE)
         self.screen.blit(Name, (self.screen.get_width() / 2 - Name.get_width() / 2 + 10, self.screen.get_height() / 7))
 
 
@@ -158,15 +163,19 @@ class MainMenu:
 
 class Game:
 
-    def __init__(self, MainSurface: pygame.Surface,  Ball: pygame.Rect, Paddle_right: pygame.Rect, Paddle_left: pygame.Rect,
-                FPS_font: pygame.font.Font, UI_Font:pygame.font.Font, Hit_sound: pygame.mixer.Sound, Lost_sound: pygame.mixer.Sound):
+    def __init__(self, Surface: pygame.Surface,  Ball: pygame.Rect, Paddle_right: pygame.Rect, Paddle_left: pygame.Rect,
+                FPS_font: pygame.font.Font, Score_Font: pygame.font.Font, Names_Font: pygame.font.Font, Paused_Font: pygame.font.Font,
+                Hit_sound: pygame.mixer.Sound, Lost_sound: pygame.mixer.Sound):
         self.playing = True
-        self.screen = MainSurface
+        self.paused = False
+        self.screen = Surface
         self.ball = Ball
         self.paddle_right = Paddle_right
         self.paddle_left = Paddle_left
         self.fps_font = FPS_font
-        self.UI_font = UI_Font
+        self.score_font = Score_Font
+        self.names_font = Names_Font
+        self.paused_font = Paused_Font
         self.hit_sound = Hit_sound
         self.lose_sound = Lost_sound
         self.winner = ""
@@ -181,17 +190,20 @@ class Game:
                     quit()
                     sys.exit()
             self.Draw(SPECIAL_COLOR, GRAY, WHITE, BLACK)
-            self.UI(CYAN)
-            pygame.display.update()
-            if self.playing:
+            self.UI(CYAN, WHITE)
+            if self.playing and not self.paused:
                 self.Ball_movement()
                 self.Paddles_movement()
             else:
                 self.Center_ball_paddles()
+                if self.paused and self.playing:
+                    self.Paused_menu(RED)
+            pygame.display.update()
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_ESCAPE]:
-                Transition(WIN, SPECIAL_COLOR, CYAN)
-                run = False
+                self.paused = True
+            if keys_pressed[pygame.K_v]: # For now
+                self.paused = False
 
 
     def Draw(self, bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
@@ -208,21 +220,21 @@ class Game:
         pygame.draw.rect(self.screen, Paddles_color, self.paddle_left)
 
 
-    def UI(self, Text_color: tuple):
-        fps = self.fps_font.render(str(int(clock.get_fps())), 1, Text_color)
-        right_player_points = self.UI_font.render(f"Score: {paddle_right_points}/{limit_points}", 1, Text_color)
-        left_player_points = self.UI_font.render(f"Score: {paddle_left_points}/{limit_points}", 1, Text_color)
+    def UI(self, Score_color: tuple, Names_color: tuple):
+        fps = self.fps_font.render(str(int(clock.get_fps())), 1, Score_color)
+        right_player_points = self.score_font.render(f"Score: {paddle_right_points}/{limit_points}", 1, Score_color)
+        left_player_points = self.score_font.render(f"Score: {paddle_left_points}/{limit_points}", 1, Score_color)
         if self.playing:
-            right_player_name = self.UI_font.render(name_right, 1, Text_color)
-            left_player_name = self.UI_font.render(name_left, 1, Text_color)
+            right_player_name = self.names_font.render(name_right, 1, Names_color)
+            left_player_name = self.names_font.render(name_left, 1, Names_color)
         elif self.winner != "":
             if self.winner == name_right:
-                right_player_name = self.UI_font.render(f"{name_right} Won!", 1, GREEN)
-                left_player_name = self.UI_font.render(f"{name_left} Lost!", 1, RED)
+                right_player_name = self.names_font.render(f"{name_right} Won!", 1, GREEN)
+                left_player_name = self.names_font.render(f"{name_left} Lost!", 1, RED)
             else:
-                right_player_name = self.UI_font.render(f"{name_right} Lost!", 1, RED)
-                left_player_name = self.UI_font.render(f"{name_left} Won!", 1, GREEN)
-            game_over = self.UI_font.render("Hello there", 1, BLUE, WHITE)
+                right_player_name = self.names_font.render(f"{name_right} Lost!", 1, RED)
+                left_player_name = self.names_font.render(f"{name_left} Won!", 1, GREEN)
+            game_over = self.score_font.render("Hello there", 1, BLUE, WHITE)
             self.screen.blit(gameOver, (self.screen.get_width() / 2 - gameOver.get_width() / 2,
                                         self.screen.get_height() / 2 - gameOver.get_height() / 2))
             pygame.draw.rect(gameOver, TRANSPERANT_BLACK, gameOver_rect, 0, 25)
@@ -309,6 +321,15 @@ class Game:
         self.paddle_right.centery = self.screen.get_height() / 2 + int(self.screen.get_height() / 7.5) / 2
         self.paddle_left.centery = self.screen.get_height() / 2 + int(self.screen.get_height() / 7.5) / 2
 
+
+    def Paused_menu(self, Text_color: tuple):
+        self.screen.blit(gamePaused, (self.screen.get_width() / 2 - gamePaused.get_width() / 2,
+                                    self.screen.get_height() / 2 - gamePaused.get_height() / 2 + int(self.screen.get_height() / 7.5) / 2))
+        pygame.draw.rect(gamePaused, TRANSPERANT_BLACK, gamePaused_rect, 0, 25)
+        paused_text = self.paused_font.render("Paused", 1, Text_color)
+        self.screen.blit(paused_text, (self.screen.get_width() / 2 - paused_text.get_width() / 2,
+        self.screen.get_height() / 2 - gamePaused.get_height() / 2 + int(self.screen.get_height() / 7.5) / 2 + gamePaused.get_height() / 7))
+
 class Settings:
     pass
 
@@ -320,7 +341,7 @@ class Button:
         self.text = Text
         self.font = Font
 
-    def clicked(self, clicked_pos: tuple) -> bool:
+    def on_button(self, clicked_pos: tuple) -> bool:
         if clicked_pos[0] > self.rect.x and clicked_pos[0] < self.rect.right and\
             clicked_pos[1] > self.rect.y and clicked_pos[1] < self.rect.bottom:
             return True
@@ -351,7 +372,7 @@ class Button:
 
 # Objects:
 mainMenu = MainMenu(WIN)
-game = Game(WIN, ball, Paddle_right, Paddle_left, FPS_FONT, UI_FONT, HIT_BALL, LOST)
+game = Game(WIN, ball, Paddle_right, Paddle_left, FPS_FONT, SCORE_FONT, NAMES_FONT, PAUSED_FONT, HIT_BALL, LOST)
 settings = Settings()
 button_game = Button(WIN, play_button, "Play", BUTTONS_FONT)
 button_settings = Button(WIN, settings_button, "Settings", BUTTONS_FONT)

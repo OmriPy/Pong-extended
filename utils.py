@@ -2,9 +2,9 @@ import pygame
 import os
 
 def quit():
-    pygame.quit()
-    pygame.font.quit()
     pygame.display.quit()
+    pygame.font.quit()
+    pygame.quit()
 
 def join(dirs: list[str]) -> str:
     path = dirs[0]

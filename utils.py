@@ -25,13 +25,11 @@ def Transition(screen: pygame.Surface, starting_color: tuple | list, ending_colo
         for i in range(len(current)):
             if current[i] > 0:
                 current[i] -= 1
-            else: continue
         screen.fill(tuple(current))
         pygame.display.update()
     while current != ending_color:
         for i in range(len(current)):
             if current[i] < ending_color[i]:
                 current[i] += 1
-            else: continue
         screen.fill(tuple(current))
         pygame.display.update()

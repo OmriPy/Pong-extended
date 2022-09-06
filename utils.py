@@ -17,7 +17,7 @@ def equal(vels: list[int]) -> bool:
         if vels[i] != vels[0]: return False
     return True
 
-def Transition(screen: pygame.Surface ,starting_color: tuple[int, int, int] | list[int, int, int], ending_color: tuple[int, int, int] | list[int, int, int]):
+def Transition(screen: pygame.Surface, starting_color: tuple | list, ending_color: tuple | list):
     starting_color = list(starting_color)
     ending_color = list(ending_color)
     current = starting_color
@@ -25,15 +25,13 @@ def Transition(screen: pygame.Surface ,starting_color: tuple[int, int, int] | li
         for i in range(len(current)):
             if current[i] > 0:
                 current[i] -= 1
-                screen.fill(tuple(current))
-                pygame.display.update()
-                #pygame.time.delay(2)
             else: continue
+        screen.fill(tuple(current))
+        pygame.display.update()
     while current != ending_color:
         for i in range(len(current)):
             if current[i] < ending_color[i]:
                 current[i] += 1
-                screen.fill(tuple(current))
-                pygame.display.update()
-                #pygame.time.delay(2)
             else: continue
+        screen.fill(tuple(current))
+        pygame.display.update()

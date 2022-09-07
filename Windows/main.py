@@ -109,7 +109,7 @@ class MainMenu:
         while True:
             clock.tick(FPS)
             for event in pygame.event.get():
-                if event.type is pygame.QUIT:
+                if event.type == pygame.QUIT:
                     quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:

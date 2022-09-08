@@ -106,7 +106,7 @@ class MainMenu:
 
     @staticmethod
     def Display():
-        opened = False
+        opened = True
         while True:
             clock.tick(FPS)
             for event in pygame.event.get():
@@ -121,10 +121,10 @@ class MainMenu:
                         Transition(WIN, CYAN, BLACK)
                         quit()
                         sys.exit()
-                if not opened:
+                if opened:
                     Transition(WIN, BLACK, CYAN)
                     pygame.mixer.Sound.play(STARTING_GAME)
-                    opened = True
+                    opened = False
             MainMenu.Move_clouds()
             MainMenu.Draw(CYAN)
 

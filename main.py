@@ -57,10 +57,14 @@ settings_button = pygame.Rect(0, 0, 160, 50)
 exit_button = pygame.Rect(0, 0, 160, 50)
 
 CLOUDS_Y = [(20, 75), (50, 150), (125, 175), (150, 250)]
-cloud1 = pygame.Rect(random.randint(0, WIDTH - CLOUD1.get_width()), random.randint(CLOUDS_Y[0][0], CLOUDS_Y[0][1]), CLOUD1.get_width(), CLOUD1.get_height())
-cloud2 = pygame.Rect(random.randint(0, WIDTH - CLOUD2.get_width()), random.randint(CLOUDS_Y[1][0], CLOUDS_Y[1][1]), CLOUD2.get_width(), CLOUD2.get_height())
-cloud3 = pygame.Rect(random.randint(0, WIDTH - CLOUD3.get_width()), random.randint(CLOUDS_Y[2][0], CLOUDS_Y[2][1]), CLOUD3.get_width(), CLOUD3.get_height())
-cloud4 = pygame.Rect(random.randint(0, WIDTH - CLOUD4.get_width()), random.randint(CLOUDS_Y[3][0], CLOUDS_Y[3][1]), CLOUD4.get_width(), CLOUD4.get_height())
+cloud1 = pygame.Rect(random.randint(0, WIDTH - CLOUD1.get_width()),
+                    random.randint(CLOUDS_Y[0][0], CLOUDS_Y[0][1]), CLOUD1.get_width(), CLOUD1.get_height())
+cloud2 = pygame.Rect(random.randint(0, WIDTH - CLOUD2.get_width()),
+                    random.randint(CLOUDS_Y[1][0], CLOUDS_Y[1][1]), CLOUD2.get_width(), CLOUD2.get_height())
+cloud3 = pygame.Rect(random.randint(0, WIDTH - CLOUD3.get_width()),
+                    random.randint(CLOUDS_Y[2][0], CLOUDS_Y[2][1]), CLOUD3.get_width(), CLOUD3.get_height())
+cloud4 = pygame.Rect(random.randint(0, WIDTH - CLOUD4.get_width()),
+                    random.randint(CLOUDS_Y[3][0], CLOUDS_Y[3][1]), CLOUD4.get_width(), CLOUD4.get_height())
 
 buttons_area = pygame.Surface((275, 275), pygame.SRCALPHA)
 buttons_area_rect = pygame.Rect(0, 0, buttons_area.get_width(), buttons_area.get_height())

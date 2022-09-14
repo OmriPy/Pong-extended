@@ -397,7 +397,6 @@ button_exit = Button(WIN, exit_button, "Exit", BUTTONS_FONT)
 
 def main():
     MainMenu.Display()
-    hamor = "aboody"
 
 if __name__ == "__main__":
     main()

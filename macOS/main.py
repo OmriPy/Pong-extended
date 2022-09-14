@@ -4,13 +4,14 @@ from multipledispatch import dispatch
 from utils import *
 
 # Initialization:
+CurDir = os.path.dirname(__file__)
 pygame.init()
 pygame.font.init()
 pygame.display.init()
 WIDTH, HEIGHT = 1000, 600
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Pong")
-ICON = pygame.image.load(f"{os.getcwd()}/{join(['Assets', 'Images', 'icon.png'])}")
+ICON = pygame.image.load(join([CurDir, 'Assets', 'Images', 'icon.png']))
 pygame.display.set_icon(ICON)
 
 # Colors
@@ -30,20 +31,20 @@ SPECIAL_COLOR = (27, 35, 43)
 TRANSPERANT_BLACK = (0, 0, 0, 64)
 
 # Sound effects
-HIT_BALL = pygame.mixer.Sound(join(['Assets', 'Sound effects', 'HittingBall.mp3']))
-LOST = pygame.mixer.Sound(join(['Assets', 'Sound effects', 'Lost.mp3']))
-STARTING_GAME = pygame.mixer.Sound(join(['Assets', 'Sound effects', 'StartOfGame.mp3']))
-TRANSITION_SOUND = pygame.mixer.Sound(join(['Assets', 'Sound effects', 'Transition.wav']))
+HIT_BALL = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'HittingBall.mp3'])}")
+LOST = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'Lost.mp3'])}")
+STARTING_GAME = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'StartOfGame.mp3'])}")
+TRANSITION_SOUND = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'Transition.wav'])}")
 
 # Images
-CLOUD1 = pygame.image.load(join(['Assets', 'Images', 'cloud1.png']))
+CLOUD1 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud1.png'])}")
 CLOUD1 = pygame.transform.scale(CLOUD1, (125, 125))
-CLOUD2 = pygame.image.load(join(['Assets', 'Images', 'cloud2.png']))
-CLOUD3 = pygame.image.load(join(['Assets', 'Images', 'cloud3.png']))
-CLOUD4 = pygame.image.load(join(['Assets', 'Images', 'cloud4.png']))
-GRASS_IMGAE = pygame.image.load(join(['Assets', 'Images', 'grass.png']))
+CLOUD2 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud2.png'])}")
+CLOUD3 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud3.png'])}")
+CLOUD4 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud4.png'])}")
+GRASS_IMGAE = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'grass.png'])}")
 GRASS_IMGAE = pygame.transform.scale(GRASS_IMGAE, (100, 80))
-SUN = pygame.image.load(join(['Assets', 'Images', 'sun.png']))
+SUN = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'sun.png'])}")
 SUN = pygame.transform.scale(SUN, (175, 175))
 
 # Visual objects
@@ -106,25 +107,28 @@ class MainMenu:
 
     @staticmethod
     def Display():
-        opened = True
+        opened = False
         while True:
             clock.tick(FPS)
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type is pygame.QUIT:
                     quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_game.under(pygame.mouse.get_pos()):
                         pygame.mouse.set_visible(False)
+                        Game.run = True
+                        Game.playing = True
+                        Game.paused = False
                         Game.Play()
                     elif button_exit.under(pygame.mouse.get_pos()):
                         Transition(WIN, CYAN, BLACK)
                         quit()
                         sys.exit()
-                if opened:
+                if not opened:
                     Transition(WIN, BLACK, CYAN)
                     pygame.mixer.Sound.play(STARTING_GAME)
-                    opened = False
+                    opened = True
             MainMenu.Move_clouds()
             MainMenu.Draw(CYAN)
 
@@ -169,17 +173,18 @@ class MainMenu:
 
 class Game:
     
+    run = True
     playing = True
     paused = False
+    in_paused_menu = False
     winner = ""
 
     @staticmethod
     def Play():
-        run = True
-        while run:
+        while Game.run:
             clock.tick(FPS)
             for event in pygame.event.get():
-                if event.type is pygame.QUIT:
+                if event.type == pygame.QUIT:
                     quit()
                     sys.exit()
             Game.Draw(SPECIAL_COLOR, GRAY, WHITE, BLACK)
@@ -189,14 +194,18 @@ class Game:
                 Game.Paddles_movement()
             else:
                 Game.Center_ball_paddles()
-                if Game.paused and Game.playing:
-                    Game.Paused_menu(RED)
+                if Game.paused and Game.playing and Game.in_paused_menu:
+                    Game.Paused_menu_UI()
+                    Game.Paused_menu_Keys()
             pygame.display.update()
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_ESCAPE]:
-                Game.paused = True
-            if keys_pressed[pygame.K_v]: # For now
-                Game.paused = False
+                if Game.in_paused_menu == False:
+                    Game.paused = True
+                    Game.in_paused_menu = True
+                else:
+                    Game.paused = False
+                    Game.in_paused_menu = False
 
     @staticmethod
     def Draw(bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
@@ -315,19 +324,31 @@ class Game:
         Paddle_left.centery = WIN.get_height() / 2 + int(WIN.get_height() / 7.5) / 2
 
     @staticmethod
-    def Paused_menu(Text_color: tuple):
+    def Paused_menu_UI():
         WIN.blit(gamePaused, (WIN.get_width() / 2 - gamePaused.get_width() / 2,
                                     WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2))
         pygame.draw.rect(gamePaused, TRANSPERANT_BLACK, gamePaused_rect, 0, 25)
-        paused_text_title = PAUSED_TITLE_FONT.render("Game Paused", 1, Text_color)
-        paused_text_continue = PAUSED_FONT.render("To keep playing, press ENTER", 1, GREEN)
-        paused_text_back = PAUSED_FONT.render("To go back to main menu, press ESC", 1, GREEN)
+        paused_text_title = PAUSED_TITLE_FONT.render("Game Paused", 1, RED)
+        paused_text_continue = PAUSED_FONT.render("To keep playing, press Enter", 1, PURPLE)
+        paused_text_back = PAUSED_FONT.render("To go back to main menu, press ESC", 1, PURPLE)
         WIN.blit(paused_text_title, (WIN.get_width() / 2 - paused_text_title.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + gamePaused.get_height() / 7))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + gamePaused.get_height() / 8))
+
         WIN.blit(paused_text_continue, (WIN.get_width() / 2 - paused_text_continue.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + gamePaused.get_height() / 4))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + 50))
+
         WIN.blit(paused_text_back, (WIN.get_width() / 2 - paused_text_back.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + gamePaused.get_height() / 2))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + 75))
+    
+    @staticmethod
+    def Paused_menu_Keys():
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_KP_ENTER] or keys_pressed[13]: # 13 is the ascii code for the left Enter key.
+            Game.run = False
+            Game.playing = False
+            Game.paused = False
+            Game.in_paused_menu = False
+            pygame.mouse.set_visible(True)
 
 class Settings:
     pass
@@ -376,6 +397,7 @@ button_exit = Button(WIN, exit_button, "Exit", BUTTONS_FONT)
 
 def main():
     MainMenu.Display()
+    hamor = "aboody"
 
 if __name__ == "__main__":
     main()

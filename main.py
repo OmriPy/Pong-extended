@@ -366,8 +366,8 @@ class Button:
         self.font = Font
 
     def under(self, clicked_pos: tuple) -> bool:
-        if clicked_pos[0] > self.rect.x and clicked_pos[0] < self.rect.right and\
-            clicked_pos[1] > self.rect.y and clicked_pos[1] < self.rect.bottom:
+        if clicked_pos[0] >= self.rect.x and clicked_pos[0] <= self.rect.right and\
+            clicked_pos[1] >= self.rect.y and clicked_pos[1] <= self.rect.bottom:
             return True
         else: return False
 

@@ -31,20 +31,20 @@ SPECIAL_COLOR = (27, 35, 43)
 TRANSPERANT_BLACK = (0, 0, 0, 64)
 
 # Sound effects
-HIT_BALL = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'HittingBall.mp3'])}")
-LOST = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'Lost.mp3'])}")
-STARTING_GAME = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'StartOfGame.mp3'])}")
-TRANSITION_SOUND = pygame.mixer.Sound(f"{CurDir}/{join(['Assets', 'Sound effects', 'Transition.wav'])}")
+HIT_BALL = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'HittingBall.mp3']))
+LOST = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'Lost.mp3']))
+STARTING_GAME = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'StartOfGame.mp3']))
+TRANSITION_SOUND = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'Transition.wav']))
 
 # Images
-CLOUD1 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud1.png'])}")
+CLOUD1 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud1.png']))
 CLOUD1 = pygame.transform.scale(CLOUD1, (125, 125))
-CLOUD2 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud2.png'])}")
-CLOUD3 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud3.png'])}")
-CLOUD4 = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'cloud4.png'])}")
-GRASS_IMGAE = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'grass.png'])}")
+CLOUD2 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud2.png']))
+CLOUD3 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud3.png']))
+CLOUD4 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud4.png']))
+GRASS_IMGAE = pygame.image.load(join([CurDir, 'Assets', 'Images', 'grass.png']))
 GRASS_IMGAE = pygame.transform.scale(GRASS_IMGAE, (100, 80))
-SUN = pygame.image.load(f"{CurDir}/{join(['Assets', 'Images', 'sun.png'])}")
+SUN = pygame.image.load(join([CurDir, 'Assets', 'Images', 'sun.png']))
 SUN = pygame.transform.scale(SUN, (175, 175))
 
 # Visual objects

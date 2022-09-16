@@ -4,7 +4,7 @@ from multipledispatch import dispatch
 from utils import *
 
 # Initialization:
-CurDir = os.path.dirname(__file__)
+CurDir = os.path.dirname(__file__) # Change this variable's value to pathlib.Path.cwd() when Building
 pygame.init()
 pygame.font.init()
 pygame.display.init()
@@ -161,8 +161,7 @@ class MainMenu:
 
     @staticmethod
     def Move_clouds():
-        i = 0
-        for cloud in [cloud1, cloud2, cloud3, cloud4]:
+        for i, cloud in enumerate([cloud1, cloud2, cloud3, cloud4]):
             cloud.x += CLOUDS_VELS[i]
             if cloud.x > WIN.get_width() or cloud.right < 0: # Respawn cloud
                 cloud.y = random.randint(CLOUDS_Y[i][0], CLOUDS_Y[i][1])
@@ -173,7 +172,6 @@ class MainMenu:
                     cloud.x = 0 - cloud.width
                 else:
                     cloud.x = WIN.get_width()
-            i += 1
 
 class Game:
     

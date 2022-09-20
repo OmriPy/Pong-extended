@@ -76,8 +76,8 @@ gamePaused = pygame.Surface((300, 100), pygame.SRCALPHA)
 gamePaused_rect = pygame.Rect(0, 0, gamePaused.get_width(), gamePaused.get_height())
 
 # Velocities
-VELOCITIES = [[4, -4], [3, -3]]
-ball_vel_x, ball_vel_y = random.choice(VELOCITIES[0]), random.choice(VELOCITIES[1])
+BALL_VELS = {"X": [4, -4], "Y": [3, -3]}
+ball_vel_x, ball_vel_y = random.choice(BALL_VELS.get("X")), random.choice(BALL_VELS.get("Y"))
 PADDLES_VEL = 4
 CLOUDS_POTENTIAL_VELS = [1, -1]
 cloud1_vel, cloud2_vel = random.choice(CLOUDS_POTENTIAL_VELS), random.choice(CLOUDS_POTENTIAL_VELS)
@@ -121,9 +121,9 @@ class MainMenu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_game.under(pygame.mouse.get_pos()):
                         pygame.mouse.set_visible(False)
-                        Game.run = True
-                        Game.playing = True
-                        Game.paused = False
+                        Game.Run = True
+                        Game.Playing = True
+                        Game.Paused = False
                         Game.Play()
                     elif button_exit.under(pygame.mouse.get_pos()):
                         Transition(WIN, CYAN, BLACK)
@@ -174,15 +174,15 @@ class MainMenu:
 
 class Game:
     
-    run = True
-    playing = True
-    paused = False
-    in_paused_menu = False
-    winner = ""
+    Run = True
+    Playing = True
+    Paused = False
+    Horizontal_Line_Y = int(WIN.get_height() / 7.5)
+    Winner = ""
 
     @staticmethod
     def Play():
-        while Game.run:
+        while Game.Run:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -190,31 +190,30 @@ class Game:
                     sys.exit()
             Game.Draw(SPECIAL_COLOR, GRAY, WHITE, BLACK)
             Game.UI(CYAN, WHITE)
-            if Game.playing and not Game.paused:
-                Game.Ball_movement()
-                Game.Paddles_movement()
+            if Game.Playing and not Game.Paused:
+                Game.Ball_Movement()
+                Game.Paddles_Movement()
             else:
                 Game.Center_ball_paddles()
-                if Game.paused and Game.playing and Game.in_paused_menu:
+                if Game.Paused and Game.Playing:
                     Game.Paused_menu_UI()
                     Game.Paused_menu_Keys()
             pygame.display.update()
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_ESCAPE]:
-                if Game.in_paused_menu == False:
-                    Game.paused = True
-                    Game.in_paused_menu = True
+                if not Game.Paused:
+                    Game.Paused = True
                 else:
-                    Game.paused = False
-                    Game.in_paused_menu = False
+                    Game.Paused = False
+            Game.Horizontal_Line_Y = int(WIN.get_height() / 7.5)
 
     @staticmethod
     def Draw(bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
         WIN.fill(bg)
         pygame.draw.line(WIN, Lines_color, (WIN.get_width() / 2, 0),
-                                                    (WIN.get_width() / 2, WIN.get_height()), 2)
-        pygame.draw.line(WIN, Lines_color, (0, int(WIN.get_height() / 7.5)),
-                                                    (WIN.get_width(), int(WIN.get_height() / 7.5)), 4)
+                                            (WIN.get_width() / 2, WIN.get_height()), 2)
+        pygame.draw.line(WIN, Lines_color, (0, Game.Horizontal_Line_Y),
+                                            (WIN.get_width(), Game.Horizontal_Line_Y), 4)
         pygame.draw.ellipse(WIN, Ball_color, ball)
         Paddle_right.x = WIN.get_width() - Paddle_right.width - 2
         Paddle_right.height = int(WIN.get_height() / 8.57)
@@ -227,7 +226,7 @@ class Game:
         fps = FPS_FONT.render(str(int(clock.get_fps())), 1, Score_color)
         right_player_points = SCORE_FONT.render(f"Score: {paddle_right_points}/{limit_points}", 1, Score_color)
         left_player_points = SCORE_FONT.render(f"Score: {paddle_left_points}/{limit_points}", 1, Score_color)
-        if Game.playing:
+        if Game.Playing:
             right_player_name = NAMES_FONT.render(name_right, 1, Names_color)
             left_player_name = NAMES_FONT.render(name_left, 1, Names_color)
         elif Game.winner != "":
@@ -248,11 +247,11 @@ class Game:
         WIN.blit(right_player_points, (WIN.get_width() / 2 + 10, 10))
         WIN.blit(left_player_points, (10, 10))
         WIN.blit(right_player_name, (WIN.get_width() / 2 + 10,
-                                            int(WIN.get_height() / 7.5) - right_player_name.get_height() - 10))
-        WIN.blit(left_player_name, (10, int(WIN.get_height() / 7.5) - right_player_name.get_height() - 10))
+                                        Game.Horizontal_Line_Y - right_player_name.get_height() - 10))
+        WIN.blit(left_player_name, (10, Game.Horizontal_Line_Y - right_player_name.get_height() - 10))
 
     @staticmethod
-    def Ball_movement():
+    def Ball_Movement():
         global ball_vel_x, ball_vel_y
         ball.x += ball_vel_x
         ball.y += ball_vel_y
@@ -275,22 +274,22 @@ class Game:
             else:
                 Game.New_round("right")
         # Collisions
-        if ball.top <= int(WIN.get_height() / 7.5) or ball.bottom >= WIN.get_height():
+        if ball.top <= Game.Horizontal_Line_Y or ball.bottom >= WIN.get_height():
             ball_vel_y *= -1
         if ball.left <= 0 or ball.right >= WIN.get_width():
             ball_vel_x *= -1
 
     @staticmethod
-    def Paddles_movement():
+    def Paddles_Movement():
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_UP]: # Up
-            if Paddle_right.top - PADDLES_VEL > int(WIN.get_height() / 7.5):
+            if Paddle_right.top - PADDLES_VEL > Game.Horizontal_Line_Y:
                 Paddle_right.y -= PADDLES_VEL
         if keys_pressed[pygame.K_DOWN]: # Down
             if Paddle_right.bottom + PADDLES_VEL <= WIN.get_height():
                 Paddle_right.y += PADDLES_VEL
         if keys_pressed[pygame.K_w]: # W
-            if Paddle_left.top - PADDLES_VEL > int(WIN.get_height() / 7.5):
+            if Paddle_left.top - PADDLES_VEL > Game.Horizontal_Line_Y:
                 Paddle_left.y -= PADDLES_VEL
         if keys_pressed[pygame.K_s]: # S
             if Paddle_left.bottom + PADDLES_VEL <= WIN.get_height():
@@ -303,51 +302,51 @@ class Game:
         pygame.display.flip()
         pygame.event.pump()
         pygame.time.delay(int(2.5 * 1000))
-        ball.center = (WIN.get_width() / 2, WIN.get_height() / 2 + int(WIN.get_height() / 7.5) / 2)
+        ball.center = (WIN.get_width() / 2, WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2)
         if winner == "right":
-            ball_vel_x = VELOCITIES[0][1]
+            ball_vel_x = BALL_VELS.get("X")[1]
             paddle_right_points += 1
             if paddle_right_points >= limit_points:
                 Game.winner = name_right
-                Game.playing = False
+                Game.Playing = False
         elif winner == "left":
-            ball_vel_x = VELOCITIES[0][0]
+            ball_vel_x = BALL_VELS.get("X")[0]
             paddle_left_points += 1
             if paddle_left_points >= limit_points:
                 Game.winner = name_left
-                Game.playing = False
+                Game.Playing = False
         else: raise Exception("Please enter \"right\" or \"left\".")
     
     @staticmethod
     def Center_ball_paddles():
-        ball.center = (WIN.get_width() / 2, WIN.get_height() / 2 + int(WIN.get_height() / 7.5) / 2)
-        Paddle_right.centery = WIN.get_height() / 2 + int(WIN.get_height() / 7.5) / 2
-        Paddle_left.centery = WIN.get_height() / 2 + int(WIN.get_height() / 7.5) / 2
+        ball.center = (WIN.get_width() / 2, WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2)
+        Paddle_right.centery = WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2
+        Paddle_left.centery = WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2
 
     @staticmethod
     def Paused_menu_UI():
         WIN.blit(gamePaused, (WIN.get_width() / 2 - gamePaused.get_width() / 2,
-                                    WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2))
+                            WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2))
         pygame.draw.rect(gamePaused, TRANSPERANT_BLACK, gamePaused_rect, 0, 25)
         paused_text_title = PAUSED_TITLE_FONT.render("Game Paused", 1, RED)
         paused_text_continue = PAUSED_FONT.render("To keep playing, press Enter", 1, PURPLE)
         paused_text_back = PAUSED_FONT.render("To go back to main menu, press ESC", 1, PURPLE)
         WIN.blit(paused_text_title, (WIN.get_width() / 2 - paused_text_title.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + gamePaused.get_height() / 8))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2 + gamePaused.get_height() / 8))
 
         WIN.blit(paused_text_continue, (WIN.get_width() / 2 - paused_text_continue.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + 50))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2 + 50))
 
         WIN.blit(paused_text_back, (WIN.get_width() / 2 - paused_text_back.get_width() / 2,
-        WIN.get_height() / 2 - gamePaused.get_height() / 2 + int(WIN.get_height() / 7.5) / 2 + 75))
+        WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2 + 75))
     
     @staticmethod
     def Paused_menu_Keys():
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_KP_ENTER] or keys_pressed[13]: # 13 is the ascii code for the left Enter key.
-            Game.run = False
-            Game.playing = False
-            Game.paused = False
+            Game.Run = False
+            Game.Playing = False
+            Game.Paused = False
             Game.in_paused_menu = False
             pygame.mouse.set_visible(True)
 

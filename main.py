@@ -177,7 +177,7 @@ class Game:
     Run = True
     Playing = True
     Paused = False
-    Horizontal_Line_Y = int(WIN.get_height() / 7.5)
+    Horizontal_Line_Y = None
     Winner = ""
 
     @staticmethod
@@ -188,6 +188,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     quit()
                     sys.exit()
+            Game.Horizontal_Line_Y = int(WIN.get_height() / 7.5)
             Game.Draw(SPECIAL_COLOR, GRAY, WHITE, BLACK)
             Game.UI(CYAN, WHITE)
             if Game.Playing and not Game.Paused:
@@ -196,16 +197,9 @@ class Game:
             else:
                 Game.Center_ball_paddles()
                 if Game.Paused and Game.Playing:
-                    Game.Paused_menu_UI()
-                    Game.Paused_menu_Keys()
+                    Game.Paused_Menu_UI()
+                    Game.Paused_Menu_Keys()
             pygame.display.update()
-            keys_pressed = pygame.key.get_pressed()
-            if keys_pressed[pygame.K_ESCAPE]:
-                if not Game.Paused:
-                    Game.Paused = True
-                else:
-                    Game.Paused = False
-            Game.Horizontal_Line_Y = int(WIN.get_height() / 7.5)
 
     @staticmethod
     def Draw(bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
@@ -324,7 +318,7 @@ class Game:
         Paddle_left.centery = WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2
 
     @staticmethod
-    def Paused_menu_UI():
+    def Paused_Menu_UI():
         WIN.blit(gamePaused, (WIN.get_width() / 2 - gamePaused.get_width() / 2,
                             WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2))
         pygame.draw.rect(gamePaused, TRANSPERANT_BLACK, gamePaused_rect, 0, 25)
@@ -341,14 +335,19 @@ class Game:
         WIN.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2 + 75))
     
     @staticmethod
-    def Paused_menu_Keys():
+    def Paused_Menu_Keys():
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_KP_ENTER] or keys_pressed[13]: # 13 is the ascii code for the left Enter key.
             Game.Run = False
             Game.Playing = False
             Game.Paused = False
-            Game.in_paused_menu = False
             pygame.mouse.set_visible(True)
+        elif keys_pressed[pygame.K_ESCAPE]:
+            #if not Game.Paused:
+            #    Game.Paused = True
+            #else:
+            #    Game.Paused = False
+            Game.Paused = not Game.Paused
 
 class Settings:
     pass

@@ -134,6 +134,7 @@ class MainMenu:
                     opened = True
             MainMenu.Move_clouds()
             MainMenu.Draw(CYAN)
+
     @staticmethod
     def Draw(bg: tuple):
         WIN.fill(bg)
@@ -150,9 +151,9 @@ class MainMenu:
         button_game.rect.x, button_game.rect.y = WIN.get_width() / 2 - button_game.rect.width / 2, WIN.get_height() / 2 - 50
         button_settings.rect.x, button_settings.rect.y = WIN.get_width() / 2 - button_settings.rect.width / 2, WIN.get_height() / 2 + button_settings.rect.height / 2
         button_exit.rect.x, button_exit.rect.y = WIN.get_width() / 2 - button_exit.rect.width / 2, WIN.get_height() / 2 + 100
-        button_game.Draw(BLUE, BLUE, WHITE, 3, 10, False)
-        button_settings.Draw(PURPLE, PURPLE, WHITE, 3, 10, False)
-        button_exit.Draw(RED, RED, WHITE, 3, 10, False)
+        button_game.Draw(BLUE, BLUE, WHITE, 3, 10)
+        button_settings.Draw(PURPLE, PURPLE, WHITE, 3, 10)
+        button_exit.Draw(RED, RED, WHITE, 3, 10)
         Name = PONG_FONT.render("PONG", 1, BLUE)
         WIN.blit(Name, (WIN.get_width() / 2 - Name.get_width() / 2, WIN.get_height() / 7))
         pygame.display.update()
@@ -173,10 +174,10 @@ class MainMenu:
 
 class Game:
     
-    Run = True
-    Playing = True
+    Run = False
+    Playing = False
     Paused = False
-    Horizontal_Line_Y = None
+    Horizontal_Line_Y: None
     Winner = ""
 
     @staticmethod
@@ -195,7 +196,7 @@ class Game:
                 Game.Paddles_Movement()
             else:
                 Game.Center_ball_paddles()
-                if Game.Paused and Game.Playing:
+                if Game.Playing and Game.Paused:
                     Game.Paused_Menu_UI()
                     Game.Paused_Menu_Keys()
             pygame.display.update()
@@ -222,8 +223,8 @@ class Game:
         if Game.Playing:
             right_player_name = NAMES_FONT.render(name_right, 1, Names_color)
             left_player_name = NAMES_FONT.render(name_left, 1, Names_color)
-        elif Game.winner != "":
-            if Game.winner == name_right:
+        elif Game.Winner != "":
+            if Game.Winner == name_right:
                 right_player_name = NAMES_FONT.render(f"{name_right} Won!", 1, GREEN)
                 left_player_name = NAMES_FONT.render(f"{name_left} Lost!", 1, RED)
             else:
@@ -248,8 +249,7 @@ class Game:
         global ball_vel_x, ball_vel_y
         ball.x += ball_vel_x
         ball.y += ball_vel_y
-        # Intersection with right paddle
-        if ball.right >= Paddle_right.left:
+        if ball.right >= Paddle_right.left: # Intersection with right paddle
             if ball.centery - 5 < Paddle_right.bottom and\
                ball.centery + 5 > Paddle_right.top: # If the right paddle blocked the ball
                 pygame.mixer.Sound.play(HIT_BALL)
@@ -257,8 +257,7 @@ class Game:
                 ball.right = Paddle_right.left
             else:
                 Game.New_round("left")
-        # Intersection with left paddle
-        elif ball.left <= Paddle_left.right:
+        elif ball.left <= Paddle_left.right :# Intersection with left paddle
             if ball.centery - 5 < Paddle_left.bottom and\
                ball.centery + 5 > Paddle_left.top: # If the left paddle blocked the ball
                 pygame.mixer.Sound.play(HIT_BALL)
@@ -289,24 +288,24 @@ class Game:
                 Paddle_left.y += PADDLES_VEL
 
     @staticmethod
-    def New_round(winner: str):
+    def New_round(Round_winner: str):
         global ball_vel_x, paddle_right_points, paddle_left_points
         pygame.mixer.Sound.play(LOST)
         pygame.display.flip()
         pygame.event.pump()
         pygame.time.delay(int(2.5 * 1000))
         ball.center = (WIN.get_width() / 2, WIN.get_height() / 2 + Game.Horizontal_Line_Y / 2)
-        if winner == "right":
+        if Round_winner == "right":
             ball_vel_x = BALL_VELS.get("X")[1]
             paddle_right_points += 1
             if paddle_right_points >= limit_points:
-                Game.winner = name_right
+                Game.Winner = name_right
                 Game.Playing = False
-        elif winner == "left":
+        elif Round_winner == "left":
             ball_vel_x = BALL_VELS.get("X")[0]
             paddle_left_points += 1
             if paddle_left_points >= limit_points:
-                Game.winner = name_left
+                Game.Winner = name_left
                 Game.Playing = False
         else: raise Exception("Please enter \"right\" or \"left\".")
     
@@ -348,8 +347,7 @@ class Game:
             #    Game.Paused = False
             Game.Paused = not Game.Paused
 
-class Settings:
-    pass
+class Settings: ...
 
 # Objects:
 button_game = Button(WIN, play_button, "Play", BUTTONS_FONT)

@@ -6,7 +6,3 @@ Make sure you have the necessary modules installed by typing in the command prom
 ```
 pip3 install pygame
 ```
-and:
-```
-pip3 install multipledispatch
-```

@@ -3,6 +3,7 @@ import random, sys, os
 from math import ceil
 from utils import *
 
+
 # Initialization:
 CurDir = os.path.dirname(__file__) # Change this variable's value to pathlib.Path.cwd() when Building
 pygame.init()
@@ -66,7 +67,7 @@ gamePaused = pygame.Surface((300, 100), pygame.SRCALPHA)
 gamePaused_rect = pygame.Rect(0, 0, gamePaused.get_width(), gamePaused.get_height())
 
 # Velocities
-BALL_VELS = {"X": [4, -4], "Y": [3, -3]}
+BALL_VELS = {"X": (4, -4), "Y": (3, -3)}
 ball_vel_x, ball_vel_y = random.choice(BALL_VELS.get("X")), random.choice(BALL_VELS.get("Y"))
 PADDLES_VEL = 4
 CLOUDS_POTENTIAL_VELS = [1, -1]
@@ -78,7 +79,7 @@ if equal(CLOUDS_VELS):
     CLOUDS_VELS[odd] *= -1
 
 # UI
-paddle_right_points, paddle_left_points = 0, 0
+paddle_left_points, paddle_right_points = 0, 0
 limit_points = 5
 name_right, name_left = "Right", "Left"
 
@@ -92,7 +93,7 @@ PONG_FONT.set_italic(True)
 PAUSED_TITLE_FONT = pygame.font.SysFont("Calibri", 30, True)
 PAUSED_FONT = pygame.font.SysFont("Calibri", 16, True)
 
-# Other:
+# Time:
 clock = pygame.time.Clock()
 FPS = 60
 
@@ -169,7 +170,7 @@ class Game:
     Playing = False
     Paused = False
     Horizontal_Line_Y: None
-    Windowner = ""
+    Winner = ""
 
     @staticmethod
     def Play():
@@ -214,8 +215,8 @@ class Game:
         if Game.Playing:
             right_player_name = NAMES_FONT.render(name_right, 1, Names_color)
             left_player_name = NAMES_FONT.render(name_left, 1, Names_color)
-        elif Game.Windowner != "":
-            if Game.Windowner == name_right:
+        elif Game.Winner != "":
+            if Game.Winner == name_right:
                 right_player_name = NAMES_FONT.render(f"{name_right} Won!", 1, COLORS.get("GREEN"))
                 left_player_name = NAMES_FONT.render(f"{name_left} Lost!", 1, COLORS.get("RED"))
             else:
@@ -224,7 +225,7 @@ class Game:
             game_over = SCORE_FONT.render("Hello there", 1, COLORS.get("BLUE"), COLORS.get("WHITE"))
             Window.blit(gameOver, (Window.get_width() / 2 - gameOver.get_width() / 2,
                                         Window.get_height() / 2 - gameOver.get_height() / 2))
-            pygame.draw.rect(gameOver, COLORS.get("TRASNP_BLACK"), gameOver_rect, 0, 25)
+            pygame.draw.rect(gameOver, COLORS.get("TRANSP_BLACK"), gameOver_rect, 0, 25)
             Window.blit(game_over, (Window.get_width() / 2 - game_over.get_width() / 2,
                                         Window.get_height() / 2 - game_over.get_height() / 2))
         else: raise Exception("Something is wrong!")
@@ -279,27 +280,27 @@ class Game:
                 Paddle_left.y += PADDLES_VEL
 
     @staticmethod
-    def New_round(Round_Windowner: str):
+    def New_round(Round_Winner: str):
         global ball_vel_x, paddle_right_points, paddle_left_points
         pygame.mixer.Sound.play(LOST)
         pygame.display.flip()
         pygame.event.pump()
         pygame.time.delay(int(2.5 * 1000))
         ball.center = (Window.get_width() / 2, Window.get_height() / 2 + Game.Horizontal_Line_Y / 2)
-        if Round_Windowner == "right":
+        if Round_Winner == "right":
             ball_vel_x = BALL_VELS.get("X")[1]
             paddle_right_points += 1
             if paddle_right_points >= limit_points:
-                Game.Windowner = name_right
+                Game.Winner = name_right
                 Game.Playing = False
-        elif Round_Windowner == "left":
+        elif Round_Winner == "left":
             ball_vel_x = BALL_VELS.get("X")[0]
             paddle_left_points += 1
             if paddle_left_points >= limit_points:
-                Game.Windowner = name_left
+                Game.Winner = name_left
                 Game.Playing = False
         else: raise Exception("Please enter \"right\" or \"left\".")
-    
+
     @staticmethod
     def Center_ball_paddles():
         ball.center = (Window.get_width() / 2, Window.get_height() / 2 + Game.Horizontal_Line_Y / 2)
@@ -332,10 +333,12 @@ class Game:
             Game.Paused = False
             pygame.mouse.set_visible(True)
         elif keys_pressed[pygame.K_ESCAPE]:
-            #if not Game.Paused:
-            #    Game.Paused = True
-            #else:
-            #    Game.Paused = False
+            '''
+            if not Game.Paused:
+                Game.Paused = True
+            else:
+                Game.Paused = False
+            '''
             Game.Paused = not Game.Paused
 
 class Settings: ...

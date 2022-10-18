@@ -189,8 +189,8 @@ class Game:
             else:
                 Game.Center_ball_paddles()
                 if Game.Playing and Game.Paused:
-                    Game.Paused_Menu_UI()
                     Game.Paused_Menu_Keys()
+                    Game.Paused_Menu_UI()
             pygame.display.update()
 
     @staticmethod
@@ -309,7 +309,7 @@ class Game:
     def Paused_Menu_UI():
         Window.blit(gamePaused, (Window.get_width() / 2 - gamePaused.get_width() / 2,
                             Window.get_height() / 2 - gamePaused.get_height() / 2 + Game.Horizontal_Line_Y / 2))
-        pygame.draw.rect(gamePaused, COLORS.get("TRASNP_BLACK"), gamePaused_rect, 0, 25)
+        pygame.draw.rect(gamePaused, COLORS.get("TRANSP_BLACK"), gamePaused_rect, 0, 25)
         paused_text_title = PAUSED_TITLE_FONT.render("Game Paused", 1, COLORS.get("RED"))
         paused_text_continue = PAUSED_FONT.render("To keep playing, press Enter", 1, COLORS.get("PURPLE"))
         paused_text_back = PAUSED_FONT.render("To go back to main menu, press ESC", 1, COLORS.get("PURPLE"))
@@ -337,7 +337,7 @@ class Game:
             else:
                 Game.Paused = False
             '''
-            Game.Paused = not Game.Paused
+            Game.Paused = False #not Game.Paused
 
 class Settings: ...
 

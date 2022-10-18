@@ -1,5 +1,5 @@
 import pygame
-import random, sys, os
+import random, os, sys
 from math import ceil
 from utils import *
 
@@ -12,25 +12,25 @@ pygame.display.init()
 WIDTH, HEIGHT = 1000, 600
 Window = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Pong")
-ICON = pygame.image.load(join([CurDir, 'Assets', 'Images', 'icon.png']))
+ICON = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'icon.png']))
 pygame.display.set_icon(ICON)
 
 
 # Sound effects
-HIT_BALL = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'HittingBall.mp3']))
-LOST = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'Lost.mp3']))
-STARTING_GAME = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'StartOfGame.mp3']))
-TRANSITION_SOUND = pygame.mixer.Sound(join([CurDir, 'Assets', 'Sound effects', 'Transition.wav']))
+HIT_BALL = pygame.mixer.Sound(Join([CurDir, 'Assets', 'Sound effects', 'HittingBall.mp3']))
+LOST = pygame.mixer.Sound(Join([CurDir, 'Assets', 'Sound effects', 'Lost.mp3']))
+STARTING_GAME = pygame.mixer.Sound(Join([CurDir, 'Assets', 'Sound effects', 'StartOfGame.mp3']))
+TRANSITION_SOUND = pygame.mixer.Sound(Join([CurDir, 'Assets', 'Sound effects', 'Transition.wav']))
 
 # Images
-CLOUD1 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud1.png']))
+CLOUD1 = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'cloud1.png']))
 CLOUD1 = pygame.transform.scale(CLOUD1, (125, 125))
-CLOUD2 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud2.png']))
-CLOUD3 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud3.png']))
-CLOUD4 = pygame.image.load(join([CurDir, 'Assets', 'Images', 'cloud4.png']))
-GRASS_IMGAE = pygame.image.load(join([CurDir, 'Assets', 'Images', 'grass.png']))
+CLOUD2 = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'cloud2.png']))
+CLOUD3 = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'cloud3.png']))
+CLOUD4 = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'cloud4.png']))
+GRASS_IMGAE = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'grass.png']))
 GRASS_IMGAE = pygame.transform.scale(GRASS_IMGAE, (100, 80))
-SUN = pygame.image.load(join([CurDir, 'Assets', 'Images', 'sun.png']))
+SUN = pygame.image.load(Join([CurDir, 'Assets', 'Images', 'sun.png']))
 SUN = pygame.transform.scale(SUN, (175, 175))
 
 # Visual objects
@@ -67,14 +67,14 @@ gamePaused = pygame.Surface((300, 100), pygame.SRCALPHA)
 gamePaused_rect = pygame.Rect(0, 0, gamePaused.get_width(), gamePaused.get_height())
 
 # Velocities
-BALL_VELS = {"X": (4, -4), "Y": (3, -3)}
+BALL_VELS = {'X': (4, -4), 'Y': (3, -3)}
 ball_vel_x, ball_vel_y = random.choice(BALL_VELS.get("X")), random.choice(BALL_VELS.get("Y"))
 PADDLES_VEL = 4
 CLOUDS_POTENTIAL_VELS = [1, -1]
 cloud1_vel, cloud2_vel = random.choice(CLOUDS_POTENTIAL_VELS), random.choice(CLOUDS_POTENTIAL_VELS)
 cloud3_vel, cloud4_vel = random.choice(CLOUDS_POTENTIAL_VELS), random.choice(CLOUDS_POTENTIAL_VELS)
 CLOUDS_VELS = [cloud1_vel, cloud2_vel, cloud3_vel, cloud4_vel]
-if equal(CLOUDS_VELS):
+if Equal(CLOUDS_VELS):
     odd = random.randint(0, len(CLOUDS_VELS) - 1)
     CLOUDS_VELS[odd] *= -1
 
@@ -88,7 +88,7 @@ FPS_FONT = pygame.font.SysFont("cambria", 12, True)
 SCORE_FONT = pygame.font.SysFont("Verdana", 18)
 NAMES_FONT = pygame.font.SysFont("Verdana", 22, True)
 BUTTONS_FONT = pygame.font.SysFont("Verdana", 28, True)
-PONG_FONT = pygame.font.Font(join([CurDir, "Assets", "SHOWG.ttf"]), 100)
+PONG_FONT = pygame.font.Font(Join([CurDir, "Assets", "SHOWG.ttf"]), 100)
 PONG_FONT.set_italic(True)
 PAUSED_TITLE_FONT = pygame.font.SysFont("Calibri", 30, True)
 PAUSED_FONT = pygame.font.SysFont("Calibri", 16, True)
@@ -107,7 +107,7 @@ class MainMenu:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    quit()
+                    Quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if Button_Game.Under(pygame.mouse.get_pos()):
@@ -118,7 +118,7 @@ class MainMenu:
                         Game.Play()
                     elif Button_Exit.Under(pygame.mouse.get_pos()):
                         Transition(Window, COLORS.get("CYAN"), COLORS.get("BLACK"))
-                        quit()
+                        Quit()
                         sys.exit()
                 if not opened:
                     Transition(Window, COLORS.get("BLACK"), COLORS.get("CYAN"))
@@ -157,7 +157,7 @@ class MainMenu:
             if cloud.x > Window.get_width() or cloud.right < 0: # Respawn cloud
                 cloud.y = random.randint(CLOUDS_Y.get(i)[0], CLOUDS_Y.get(i)[1])
                 CLOUDS_VELS[i] = random.choice(CLOUDS_POTENTIAL_VELS)
-                if equal(CLOUDS_VELS):
+                if Equal(CLOUDS_VELS):
                     CLOUDS_VELS[i] *= -1
                 if CLOUDS_VELS[i] == CLOUDS_POTENTIAL_VELS[0]:
                     cloud.x = 0 - cloud.width
@@ -178,7 +178,7 @@ class Game:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    quit()
+                    Quit()
                     sys.exit()
             Game.Horizontal_Line_Y = int(Window.get_height() / 7.5)
             Game.Draw(COLORS.get("SPECIAL"), COLORS.get("GRAY"), COLORS.get("WHITE"), COLORS.get("BLACK"))
@@ -196,10 +196,8 @@ class Game:
     @staticmethod
     def Draw(bg: tuple, Ball_color: tuple, Paddles_color: tuple, Lines_color: tuple):
         Window.fill(bg)
-        pygame.draw.line(Window, Lines_color, (Window.get_width() / 2, 0),
-                                            (Window.get_width() / 2, Window.get_height()), 2)
-        pygame.draw.line(Window, Lines_color, (0, Game.Horizontal_Line_Y),
-                                            (Window.get_width(), Game.Horizontal_Line_Y), 4)
+        pygame.draw.line(Window, Lines_color, (Window.get_width() / 2, 0), (Window.get_width() / 2, Window.get_height()), 2)
+        pygame.draw.line(Window, Lines_color, (0, Game.Horizontal_Line_Y), (Window.get_width(), Game.Horizontal_Line_Y), 4)
         pygame.draw.ellipse(Window, Ball_color, ball)
         Paddle_right.x = Window.get_width() - Paddle_right.width - 2
         Paddle_right.height = int(Window.get_height() / 8.57)

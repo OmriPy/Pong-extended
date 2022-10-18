@@ -1,7 +1,7 @@
 import pygame
 import os
 
-COLORS: dict[str, tuple] = {
+COLORS = {
     "WHITE": (255, 255, 255),
     "BLACK": (0, 0, 0),
     "RED": (255, 0, 0),
@@ -16,18 +16,18 @@ COLORS: dict[str, tuple] = {
     "TRANSP_BLACK": (0, 0, 0, 64)
 }
 
-def quit():
+def Quit():
     pygame.display.quit()
     pygame.font.quit()
     pygame.quit()
 
-def join(dirs: list[str]) -> str:
+def Join(dirs: list[str]) -> str:
     path = dirs[0]
     for i in range(1, len(dirs)):
         path = os.path.join(path, dirs[i])
     return path
 
-def equal(vels: list[int]) -> bool:
+def Equal(vels: list[int]) -> bool:
     for i in range(len(vels)):
         if vels[i] != vels[0]: return False
     return True
